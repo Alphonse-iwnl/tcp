@@ -66,3 +66,11 @@ void* sendwindow::timeout(void *){
         }
     }    
 }
+ 
+sendwindow::~sendwindow(){
+      delete optr;
+      delete iptr;
+      delete nptr;
+      optr=iptr=nptr=NULL;
+      pthread_cancel(sendwindow::timeoutid);
+}
