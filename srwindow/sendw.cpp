@@ -16,17 +16,17 @@ void sendwindow::setrto(int rto){
 void sendwindow::pop(int seq){
     if(seqdeque.front()&&seqdeque.front()<=seq)
         seqdeque.pop_front();
-    else this->popfinish=1;
+    else popfinish=1;
 }
 
 void sendwindow::readack(int ack,int newwindowsize){
-    this->windowsize=newwindowsize;
+    windowsize=newwindowsize;
     ack--;
     while(popfinish!=1)
         sendwindow::pop(ack);
     popfinish=0;
     auto it=timeoutrecord.find(ack);
-    timeoutrecord.erase(timeourecord.begin(),++it);
+    timeoutrecord.erase(timeoutrecord.begin(),++it);
 
     rptr=seqdeque.begin()+windowsize;
 }
@@ -59,29 +59,32 @@ bool sendwindow::dequewait(int timeout){
 void sendwindow::writeseq(){
     if(maxseq<windowsize){
         for(auto i=seqdeque.begin();*i!=maxseq;i++)
+        {      
             timeoutrecord.insert(std::pair<int,time_t>(*i,time(0)));
-        //write from begin() to maxseq
-    } else{
-        for(auto i=seqdeque.begin();i!=rptr;i++)
-            timeoutrecord.insert(std::pair<int,time_t(*i,time(0)));
-        //write from begin() to rptr
-    }
-}
-
+            //write from begin() to maxseq
+        }
+    }   else{
+            for(auto i=seqdeque.begin();i!=rptr;i++){
+                timeoutrecord.insert(std::pair<int,time_t(*i,time(0)));
+                //write from begin() to rptr
+            }  
+        }
+} }    
+  
 bool sendwindow::exists(int seq){
     int begin=0,end=seqdeque.size()-1,mid;
     while(begin<=end){
         mid=(begin+end)/2;
-        if(seqdeque[mid]==seq){
+        if(seqdeque[mid]==seq)
             return true;
-        }
         else if(seqdeque[mid]<seq)
             begin=mid+1;
         else
             end=mid-1;
     }
     return false; 
-}
+}  
+
 
 void * sendwindow::timeout(void *){
     for(;;){
@@ -96,5 +99,5 @@ void * sendwindow::timeout(void *){
 }  
 
 sendwindow::~sendwindow(){
-      pthread_cancel(sendwindow::timeoutid);
-}
+    pthread_cancel(sendwindow::timeoutid);     
+} 
